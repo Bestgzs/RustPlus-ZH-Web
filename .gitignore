@@ -1,0 +1,26 @@
+# Personal pairing credentials, browser profiles, settings and logs
+/data/
+/pair-register.cjs
+/rustplus.config.json
+/settings.json
+.env
+.env.*
+!.env.example
+*.log
+*.pem
+*.key
+
+# Installed dependencies, bundled runtimes and distribution archives
+/node_modules/
+/runtime/
+/dist/
+/tmp/
+*.zip
+*.7z
+*.tar.gz
+
+# Local editor and OS files
+/.idea/
+/.vscode/
+Thumbs.db
+.DS_Store

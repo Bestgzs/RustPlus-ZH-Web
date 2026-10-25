@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rust+ 队伍助手</title><style>
+:root{color-scheme:dark;--bg:#101513;--panel:#19211d;--line:#303c34;--muted:#99aa9e;--green:#b1e784;--text:#edf2ea}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.65 "Microsoft YaHei",system-ui,sans-serif}main{max-width:1240px;margin:auto;padding:32px 26px}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:14px;flex-wrap:wrap}.header-right{display:flex;align-items:center;gap:10px}.lang-select{width:auto;padding:6px 12px;border-radius:20px;background:var(--panel);border:1px solid var(--line);font-size:13px;cursor:pointer}.eyebrow{letter-spacing:3px;font-size:11px;color:var(--green)}h1{font-size:30px;margin:5px 0}h2{font-size:18px;margin:0 0 14px}p{color:var(--muted);margin:6px 0 16px}small{color:var(--muted)}.badge{padding:7px 14px;border:1px solid var(--line);border-radius:24px;color:var(--green)}.stats{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:16px;margin-bottom:24px}.stat,.panel{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:22px}.stat strong{display:block;font-size:26px;font-weight:600;margin:6px 0 4px}.layout{display:grid;grid-template-columns:390px 1fr;gap:22px}.panel{margin-bottom:20px}label{display:block;color:#c4d1c7;margin:12px 0 5px;font-size:13px}input,select,textarea{width:100%;border:1px solid #3a483e;background:#101713;color:var(--text);padding:10px 12px;border-radius:8px;font:inherit}input:focus,select:focus,textarea:focus{outline:2px solid var(--green)}textarea{resize:vertical;min-height:90px}.row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center}button,.link{border:0;background:var(--green);color:#16200f;border-radius:8px;padding:10px 15px;cursor:pointer;font:inherit;font-weight:600}button.secondary,.link{background:#29352d;color:var(--text);border:1px solid #465647}button.small{padding:5px 10px;font-size:12px;border-radius:6px}.link{display:inline-block;text-decoration:none}button:hover,.link:hover{filter:brightness(1.13)}button:disabled{opacity:.5;cursor:wait}.check{display:flex;gap:10px;align-items:center;margin-top:12px;color:var(--text)}.check input{width:18px;height:18px;flex-shrink:0}summary{cursor:pointer;color:#c6dab9}.guide{background:#232e25;padding:15px;border-radius:10px;border-left:3px solid var(--green);font-size:13px}.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:10px}.member{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}.member-info{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tag{font-size:12px;padding:2px 8px;border-radius:99px;background:#253329;border:1px solid #3d5243;color:var(--green)}.tag.warn{color:#ffc38d;border-color:#664d36;background:#33281e}.tag.dead{color:#ffb3a0;border-color:#693b32;background:#36201c}.event{padding:10px 0;border-bottom:1px solid var(--line);word-break:break-word}.event time{display:block;color:var(--muted);font-size:11px}.death{color:#ffb3a0}.error{color:#ffc38d}.sent{color:var(--green)}#events,#chatList{max-height:290px;overflow:auto}.chat-row{padding:8px 0;border-bottom:1px solid var(--line);font-size:14px;word-break:break-word}.chat-row time{color:var(--muted);font-size:11px;margin-right:8px}.chat-name{font-weight:600;margin-right:6px}.map-wrap{position:relative;background:#0b3b4a;border:1px solid var(--line);border-radius:12px;overflow:hidden;aspect-ratio:1/1;max-height:680px;margin:0 auto;display:flex;align-items:center;justify-content:center}#mapCanvas{width:100%;height:100%;display:none;cursor:crosshair}.map-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}.map-checks{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);align-items:center}.map-checks label{margin:0;display:inline-flex;align-items:center;gap:6px;cursor:pointer}.map-checks input{width:15px;height:15px}.SavedBox{background:#141b17;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:14px}#notice{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#d7efc6;color:#142010;padding:12px 24px;border-radius:10px;display:none;max-width:90%;z-index:10}.steps{color:var(--muted);padding-left:20px}.steps li{margin:8px 0}footer{color:var(--muted);margin-top:20px;font-size:12px}@media(max-width:900px){main{padding:20px 14px}.layout{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.stat strong{font-size:22px}header{align-items:flex-start;gap:15px}h1{font-size:24px}}
+</style></head><body><main>
+<header>
+  <div>
+    <div class="eyebrow" data-i18n="eyebrow">RUST COMPANION · 本机控制台</div>
+    <h1 data-i18n="title">队伍助手</h1>
+    <p style="margin:0" data-i18n="subtitle">死亡坐标播报、昼夜倒计时、实时地图、队伍聊天与 Discord 机器人。</p>
+  </div>
+  <div class="header-right">
+    <select id="langSelect" class="lang-select" aria-label="Language">
+      <option value="zh-CN">简体中文</option>
+      <option value="zh-TW">繁體中文</option>
+      <option value="en">English</option>
+    </select>
+    <span class="badge" id="connection">正在读取状态</span>
+  </div>
+</header>
+<section class="stats">
+  <div class="stat"><small data-i18n="statServer">当前服务器</small><strong id="server">等待配对</strong><small id="serverMeta">配对后显示在线与排队人数</small></div>
+  <div class="stat"><small data-i18n="statTime">游戏内时间</small><strong id="clock">--:--</strong><small id="dayNight">队伍聊天输入 !时间 或 !time</small></div>
+  <div class="stat"><small data-i18n="statTeam">队伍在线 / 总人数</small><strong id="count">— / —</strong><small id="updated">约每 10 秒同步位置与状态</small></div>
+</section>
+<div class="layout"><aside>
+<section class="panel"><h2 data-i18n="sec01Title">01 · 配对服务器</h2><p data-i18n="sec01Desc">首次使用需要关联自己的 Steam 账号。后台启动或收到新配对后会自动连接。</p><button id="register" data-i18n="btnRegister">打开 Steam 配对登录</button><ol class="steps"><li data-i18n="step1">点击按钮，在专用浏览器窗口（优先 Chrome，未安装时自动用 Edge）登录 Steam。</li><li data-i18n="step2">登录成功后，进入 Rust 目标服务器。</li><li data-i18n="step3">按 ESC → Rust+ → 与服务器配对。</li><li data-i18n="step4">收到配对通知后会自动保存并连接服务器。</li></ol><div class="guide" id="pairing">尚未配对</div><div class="row"><button class="secondary" id="listen" data-i18n="btnListen">重新监听配对</button></div><p style="font-size:12px;margin-top:14px" data-i18n="sec01Note">登录由 Rust+ 库提供，专用浏览器窗口（Chrome 或 Edge）会临时关闭跨站隔离以接收配对结果；仅用于 Steam 配对，完成后自动关闭。独立配置保存在本程序的 data 目录。</p>
+<details><summary data-i18n="importTitle">导入已有配对配置</summary><p data-i18n="importDesc">支持 Rust+ 配置 JSON 或服务器配对通知 JSON。令牌仅保存在本机。</p><textarea id="importJson" data-i18n-ph="importPh" placeholder="粘贴配置 JSON" aria-label="配对配置 JSON"></textarea><button class="secondary" id="import" data-i18n="btnImport">导入配置</button></details></section>
+
+<section class="panel"><h2 data-i18n="sec02Title">02 · 连接与播报</h2>
+<div class="SavedBox"><label for="savedServers" style="margin-top:0" data-i18n="savedLabel">已保存的服务器收藏夹</label><select id="savedServers"><option value="">暂无已保存服务器</option></select><div class="row" style="margin-top:10px"><button type="button" class="secondary small" id="switchServer" data-i18n="btnSwitch">切换并连接</button><button type="button" class="secondary small" id="deleteServer" data-i18n="btnDelete">从收藏夹移除</button></div></div>
+<form id="settings"><label for="name" data-i18n="lblName">服务器备注</label><input id="name" autocomplete="off"><label for="host" data-i18n="lblHost">服务器 IP / 域名</label><input id="host" data-i18n-ph="phHost" placeholder="配对后自动填写" autocomplete="off"><label for="port" data-i18n="lblPort">Rust+ App 端口（不是游戏连接端口）</label><input id="port" type="number" min="1" max="65535"><label for="playerId" data-i18n="lblSteamId">SteamID64</label><input id="playerId" inputmode="numeric" autocomplete="off"><label for="playerToken" data-i18n="lblToken">服务器配对令牌</label><input id="playerToken" type="password" data-i18n-ph="phToken" placeholder="配对后自动保存，留空保留已有令牌" autocomplete="new-password">
+<label class="check"><input id="deathNotify" type="checkbox"> <span data-i18n="chkDeath">队友死亡时自动播报到队伍频道（含网格坐标）</span></label>
+<label class="check"><input id="onlineNotify" type="checkbox"> <span data-i18n="chkOnline">队友上线 / 离线时自动播报到队伍频道</span></label>
+<label for="timeEvery" data-i18n="lblTimeEvery">游戏时间定时播报（含天亮/天黑倒计时）</label><select id="timeEvery"><option value="0" data-i18n="optOff">关闭，仅通过命令查询</option><option value="5" data-i18n="opt5">每 5 分钟</option><option value="10" data-i18n="opt10">每 10 分钟</option><option value="15" data-i18n="opt15">每 15 分钟</option><option value="30" data-i18n="opt30">每 30 分钟</option><option value="60" data-i18n="opt60">每 60 分钟</option></select><div class="row"><button type="submit" data-i18n="btnSave">保存设置</button><button type="button" id="connect" data-i18n="btnConnect">连接服务器</button><button type="button" class="secondary" id="disconnect" data-i18n="btnDisconnect">断开</button></div></form><small data-i18n="sec02Foot">连接参数修改后，请重新连接。电脑和后台服务需要保持运行。</small></section>
+
+<section class="panel"><h2 data-i18n="sec03Title">03 · Discord 机器人与联动</h2><p data-i18n="sec03Desc">支持只填 Webhook 单向推送，或填 Bot Token + 频道 ID 开启完整双向机器人（支持斜杠命令与聊天互通）。</p><div class="guide" id="discordStatus">未启用</div><form id="discordForm"><label class="check"><input id="dcEnabled" type="checkbox"> <span data-i18n="chkDcEnable">启用 Discord 联动</span></label><label for="dcWebhook" data-i18n="lblDcWebhook">方式 A · Discord Webhook 链接（可选，免建 Bot）</label><input id="dcWebhook" placeholder="https://discord.com/api/webhooks/..." autocomplete="off"><label for="dcBotToken" data-i18n="lblDcToken">方式 B · Discord Bot Token（双向命令与斜杠命令）</label><input id="dcBotToken" type="password" placeholder="留空则保留已有 Token" autocomplete="new-password"><label for="dcChannelId" data-i18n="lblDcChannel">Discord 绑定频道 ID（纯数字，右键频道复制 ID）</label><input id="dcChannelId" inputmode="numeric" placeholder="123456789012345678" autocomplete="off"><label class="check"><input id="dcNotifyDeath" type="checkbox"> <span data-i18n="chkDcDeath">推送队友死亡卡片到 Discord</span></label><label class="check"><input id="dcNotifyOnline" type="checkbox"> <span data-i18n="chkDcOnline">推送队友上线 / 离线到 Discord</span></label><label class="check"><input id="dcNotifyChat" type="checkbox"> <span data-i18n="chkDcChat">同步游戏内队伍聊天到 Discord</span></label><label class="check"><input id="dcChatBridge" type="checkbox"> <span data-i18n="chkDcBridge">将 Discord 频道普通聊天转发进游戏队伍频道</span></label><div class="row"><button type="submit" data-i18n="btnSaveDc">保存 Discord 设置</button><button type="button" class="secondary" id="dcTest" data-i18n="btnTestDc">发送测试卡片</button></div></form></section>
+</aside><div>
+<section class="panel"><div class="map-bar"><h2 style="margin:0" data-i18n="mapTitle">服务器实时地图</h2><div class="map-checks"><label><input type="checkbox" id="showMonuments" checked> <span data-i18n="chkMonuments">资源点</span></label><label><input type="checkbox" id="showMembers" checked> <span data-i18n="chkMembers">队友与死亡点</span></label><span class="tag" id="hoverGrid">鼠标网格：--</span><button type="button" class="secondary small" id="resetZoom" title="点击或双击地图重置缩放">100%</button><button type="button" class="secondary small" id="refreshMap" data-i18n="btnRefreshMap">刷新地图</button><button type="button" class="secondary small" id="sendMapDiscord" data-i18n="btnMapDc">发地图到 Discord</button></div></div><div class="map-wrap"><div id="mapEmpty" class="empty" style="border:0" data-i18n="mapEmpty">连接服务器后自动加载高清地图、资源点与队友实时位置。</div><canvas id="mapCanvas"></canvas></div></section>
+<section class="panel"><h2 data-i18n="membersTitle">队伍成员与实时坐标</h2><div id="members" class="empty">连接服务器后，显示队员在线、存活状态与地图网格坐标。</div></section>
+<section class="panel"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><h2 data-i18n="chatTitle">队伍聊天</h2><div class="row" style="margin:0"><button type="button" class="secondary small" id="sendTime" data-i18n="btnSendTime">播报当前时间</button></div></div><div id="chatList"><div class="empty">连接服务器后同步游戏内队伍聊天</div></div><form id="chatForm" class="row"><input id="chatInput" data-i18n-ph="phChat" placeholder="输入消息直接发送到游戏内队伍频道（支持最多 128 字）" maxlength="128" autocomplete="off" style="flex:1"><button type="submit" data-i18n="btnSendChat">发送消息</button></form></section>
+<section class="panel"><h2 data-i18n="eventsTitle">活动记录</h2><p data-i18n="eventsDesc">连接、死亡坐标、上下线、Discord 联动与播报结果实时记录。首次连接只读取状态，不补发历史记录。</p><div id="events"><div class="empty">等待第一条活动记录</div></div></section>
+<section class="panel"><h2 data-i18n="guideTitle">游戏内与 Discord 怎么用</h2><div class="guide" id="guideContent">在<strong>游戏队伍聊天</strong>或<strong>Discord 频道</strong>发送命令（Discord 同时支持斜杠命令 <code>/time</code> <code>/pop</code> <code>/pos</code> <code>/deaths</code> <code>/map</code> <code>/say</code> <code>/leader</code>）：<br><code>!时间</code> / <code>!time</code> · 当前游戏时间 + 天亮/天黑倒计时<br><code>!人数</code> / <code>!pop</code> · 服务器在线人数与排队人数<br><code>!位置</code> / <code>!pos</code> · 全体队友当前地图网格坐标<br><code>!死亡</code> / <code>!deaths</code> · 本次运行最近死亡记录（含网格坐标）<br><code>!队长</code> / <code>!leader [名字]</code> · 将队长移交给自己或指定队友（需本人当前为队长）<br><code>!地图</code> / <code>!map</code>（仅 Discord）· 发送服务器高清地图与队友坐标到 Discord<br><code>!发送 内容</code> / <code>!say 内容</code>（仅 Discord）· 从 Discord 发消息到游戏队伍频道<br><code>!帮助</code> / <code>!help</code> · 查看命令列表</div><p style="font-size:13px;margin-top:14px" data-i18n="guideFoot">死亡依据 Rust+ 队伍状态轮询检测，可能存在约 10 秒延迟；离线或断线期间的死亡可能漏报。</p></section>
+</div></div><footer data-i18n="footer">本机部署 · 仅监听 127.0.0.1:3210 · 使用 rustplus.js 开源通信库 · 中文网页独立实现</footer>
+</main><div id="notice" role="status"></div><script>
+const I18N = {
+  'zh-CN': {
+    pageTitle: 'Rust+ 中文队伍助手',
+    eyebrow: 'RUST COMPANION · 本机控制台',
+    title: '队伍助手',
+    subtitle: '死亡坐标播报、昼夜倒计时、实时地图、队伍聊天与 Discord 机器人。',
+    statServer: '当前服务器',
+    statTime: '游戏内时间',
+    statTeam: '队伍在线 / 总人数',
+    sec01Title: '01 · 配对服务器',
+    sec01Desc: '首次使用需要关联自己的 Steam 账号。后台启动或收到新配对后会自动连接。',
+    btnRegister: '打开 Steam 配对登录',
+    step1: '点击按钮，在专用浏览器窗口（优先 Chrome，未安装时自动用 Edge）登录 Steam。',
+    step2: '登录成功后，进入 Rust 目标服务器。',
+    step3: '按 ESC → Rust+ → 与服务器配对。',
+    step4: '收到配对通知后会自动保存并连接服务器。',
+    btnListen: '重新监听配对',
+    sec01Note: '登录由 Rust+ 库提供，专用浏览器窗口（Chrome 或 Edge）会临时关闭跨站隔离以接收配对结果；仅用于 Steam 配对，完成后自动关闭。独立配置保存在本程序的 data 目录。',
+    importTitle: '导入已有配对配置',
+    importDesc: '支持 Rust+ 配置 JSON 或服务器配对通知 JSON。令牌仅保存在本机。',
+    importPh: '粘贴配置 JSON',
+    btnImport: '导入配置',
+    sec02Title: '02 · 连接与播报',
+    savedLabel: '已保存的服务器收藏夹',
+    noSaved: '暂无已保存服务器',
+    btnSwitch: '切换并连接',
+    btnDelete: '从收藏夹移除',
+    lblName: '服务器备注',
+    lblHost: '服务器 IP / 域名',
+    phHost: '配对后自动填写',
+    lblPort: 'Rust+ App 端口（不是游戏连接端口）',
+    lblSteamId: 'SteamID64',
+    lblToken: '服务器配对令牌',
+    phToken: '配对后自动保存，留空保留已有令牌',
+    chkDeath: '队友死亡时自动播报到队伍频道（含网格坐标）',
+    chkOnline: '队友上线 / 离线时自动播报到队伍频道',
+    lblTimeEvery: '游戏时间定时播报（含天亮/天黑倒计时）',
+    optOff: '关闭，仅通过命令查询',
+    opt5: '每 5 分钟', opt10: '每 10 分钟', opt15: '每 15 分钟', opt30: '每 30 分钟', opt60: '每 60 分钟',
+    btnSave: '保存设置',
+    btnConnect: '连接服务器',
+    btnDisconnect: '断开',
+    sec02Foot: '连接参数修改后，请重新连接。电脑和后台服务需要保持运行。',
+    sec03Title: '03 · Discord 机器人与联动',
+    sec03Desc: '支持只填 Webhook 单向推送，或填 Bot Token + 频道 ID 开启完整双向机器人（支持斜杠命令与聊天互通）。',
+    chkDcEnable: '启用 Discord 联动',
+    lblDcWebhook: '方式 A · Discord Webhook 链接（可选，免建 Bot）',
+    lblDcToken: '方式 B · Discord Bot Token（双向命令与斜杠命令）',
+    phDcTokenSaved: '已保存 Bot Token，留空保留',
+    phDcTokenEmpty: '粘贴 Discord Bot Token（可选）',
+    lblDcChannel: 'Discord 绑定频道 ID（纯数字，右键频道复制 ID）',
+    chkDcDeath: '推送队友死亡卡片到 Discord',
+    chkDcOnline: '推送队友上线 / 离线到 Discord',
+    chkDcChat: '同步游戏内队伍聊天到 Discord',
+    chkDcBridge: '将 Discord 频道普通聊天转发进游戏队伍频道',
+    btnSaveDc: '保存 Discord 设置',
+    btnTestDc: '发送测试卡片',
+    mapTitle: '服务器实时地图',
+    chkMonuments: '资源点',
+    chkMembers: '队友与死亡点',
+    hoverPrefix: '鼠标网格：',
+    ocean: '海域',
+    btnRefreshMap: '刷新地图',
+    btnMapDc: '发地图到 Discord',
+    mapEmpty: '连接服务器后自动加载高清地图、资源点与队友实时位置。',
+    membersTitle: '队伍成员与实时坐标',
+    membersEmpty: '连接服务器后，显示队员在线、存活状态与地图网格坐标。',
+    chatTitle: '队伍聊天',
+    btnSendTime: '播报当前时间',
+    chatEmpty: '连接服务器后同步游戏内队伍聊天',
+    phChat: '输入消息直接发送到游戏内队伍频道（支持最多 128 字）',
+    btnSendChat: '发送消息',
+    eventsTitle: '活动记录',
+    eventsDesc: '连接、死亡坐标、上下线、Discord 联动与播报结果实时记录。首次连接只读取状态，不补发历史记录。',
+    eventsEmpty: '等待第一条活动记录',
+    guideTitle: '游戏内与 Discord 怎么用',
+    guideHtml: '在<strong>游戏队伍聊天</strong>或<strong>Discord 频道</strong>发送命令（Discord 同时支持斜杠命令 <code>/time</code> <code>/pop</code> <code>/pos</code> <code>/deaths</code> <code>/map</code> <code>/say</code> <code>/leader</code>）：<br><code>!时间</code> / <code>!time</code> · 当前游戏时间 + 天亮/天黑倒计时<br><code>!人数</code> / <code>!pop</code> · 服务器在线人数与排队人数<br><code>!位置</code> / <code>!pos</code> · 全体队友当前地图网格坐标<br><code>!死亡</code> / <code>!deaths</code> · 本次运行最近死亡记录（含网格坐标）<br><code>!队长</code> / <code>!leader [名字]</code> · 将队长移交给自己或指定队友（需本人当前为队长）<br><code>!地图</code> / <code>!map</code>（仅 Discord）· 发送服务器高清地图与队友坐标到 Discord<br><code>!发送 内容</code> / <code>!say 内容</code>（仅 Discord）· 从 Discord 发消息到游戏队伍频道<br><code>!帮助</code> / <code>!help</code> · 查看命令列表',
+    guideFoot: '死亡依据 Rust+ 队伍状态轮询检测，可能存在约 10 秒延迟；离线或断线期间的死亡可能漏报。',
+    footer: '本机部署 · 仅监听 127.0.0.1:3210 · 使用 rustplus.js 开源通信库 · 多语言网页控制台',
+    leaderBadge: '👑 队长',
+    gridPrefix: '坐标 ',
+    online: '在线', offline: '离线', alive: '存活', dead: '死亡',
+    makeLeader: '设为队长',
+    waitPair: '等待配对',
+    waitServerMeta: '配对后显示在线与排队人数',
+    timeHint: '队伍聊天输入 !时间 或 !time',
+    syncHint: '约每 10 秒同步位置与状态',
+    lastUpdated: '最后更新 ',
+    offlineService: '无法连接本机服务',
+    savedOk: '设置已保存',
+    dcSavedOk: 'Discord 设置已保存',
+    dcTestOk: '已发送测试卡片到 Discord',
+    dcMapOk: '已发送服务器地图到 Discord',
+    sentOk: '已发送到队伍频道',
+    submittedOk: '操作已提交',
+    switchedOk: '已切换并正在连接服务器',
+    deletedOk: '已从收藏夹移除',
+    chatSentOk: '消息已发送到队伍频道',
+    importedOk: '配置已导入'
+  },
+  'zh-TW': {
+    pageTitle: 'Rust+ 繁體隊伍助手',
+    eyebrow: 'RUST COMPANION · 本機控制台',
+    title: '隊伍助手',
+    subtitle: '死亡座標播報、晝夜倒數計時、即時地圖、隊伍聊天與 Discord 機器人。',
+    statServer: '當前伺服器',
+    statTime: '遊戲內時間',
+    statTeam: '隊伍在線 / 總人數',
+    sec01Title: '01 · 配對伺服器',
+    sec01Desc: '首次使用需要關聯自己的 Steam 帳號。背景啟動或收到新配對後會自動連線。',
+    btnRegister: '打開 Steam 配對登入',
+    step1: '點擊按鈕，在專用瀏覽器視窗（優先 Chrome，未安裝時自動用 Edge）登入 Steam。',
+    step2: '登入成功後，進入 Rust 目標伺服器。',
+    step3: '按 ESC → Rust+ → 與伺服器配對。',
+    step4: '收到配對通知後會自動儲存並連線伺服器。',
+    btnListen: '重新監聽配對',
+    sec01Note: '登入由 Rust+ 庫提供，專用瀏覽器視窗（Chrome 或 Edge）會臨時關閉跨站隔離以接收配對結果；僅用於 Steam 配對，完成後自動關閉。獨立設定儲存在本程式的 data 目錄。',
+    importTitle: '匯入已有配對設定',
+    importDesc: '支援 Rust+ 設定 JSON 或伺服器配對通知 JSON。權杖僅儲存在本機。',
+    importPh: '貼上設定 JSON',
+    btnImport: '匯入設定',
+    sec02Title: '02 · 連線與播報',
+    savedLabel: '已儲存的伺服器收藏夾',
+    noSaved: '暫無已儲存伺服器',
+    btnSwitch: '切換並連線',
+    btnDelete: '從收藏夾移除',
+    lblName: '伺服器備註',
+    lblHost: '伺服器 IP / 網域',
+    phHost: '配對後自動填寫',
+    lblPort: 'Rust+ App 連接埠（不是遊戲連接埠）',
+    lblSteamId: 'SteamID64',
+    lblToken: '伺服器配對權杖',
+    phToken: '配對後自動儲存，留空保留已有權杖',
+    chkDeath: '隊友死亡時自動播報到隊伍頻道（含網格座標）',
+    chkOnline: '隊友上線 / 離線時自動播報到隊伍頻道',
+    lblTimeEvery: '遊戲時間定時播報（含天亮/天黑倒數計時）',
+    optOff: '關閉，僅透過指令查詢',
+    opt5: '每 5 分鐘', opt10: '每 10 分鐘', opt15: '每 15 分鐘', opt30: '每 30 分鐘', opt60: '每 60 分鐘',
+    btnSave: '儲存設定',
+    btnConnect: '連線伺服器',
+    btnDisconnect: '中斷連線',
+    sec02Foot: '連線參數修改後，請重新連線。電腦和背景服務需要保持執行。',
+    sec03Title: '03 · Discord 機器人與聯動',
+    sec03Desc: '支援只填 Webhook 單向推送，或填 Bot Token + 頻道 ID 開啟完整雙向機器人（支援斜線指令與聊天互通）。',
+    chkDcEnable: '啟用 Discord 聯動',
+    lblDcWebhook: '方式 A · Discord Webhook 連結（可選，免建 Bot）',
+    lblDcToken: '方式 B · Discord Bot Token（雙向指令與斜線指令）',
+    phDcTokenSaved: '已儲存 Bot Token，留空保留',
+    phDcTokenEmpty: '貼上 Discord Bot Token（可選）',
+    lblDcChannel: 'Discord 綁定頻道 ID（純數字，右鍵頻道複製 ID）',
+    chkDcDeath: '推送隊友死亡卡片到 Discord',
+    chkDcOnline: '推送隊友上線 / 離線到 Discord',
+    chkDcChat: '同步遊戲內隊伍聊天到 Discord',
+    chkDcBridge: '將 Discord 頻道普通聊天轉發進遊戲隊伍頻道',
+    btnSaveDc: '儲存 Discord 設定',
+    btnTestDc: '發送測試卡片',
+    mapTitle: '伺服器即時地圖',
+    chkMonuments: '資源點',
+    chkMembers: '隊友與死亡點',
+    hoverPrefix: '滑鼠網格：',
+    ocean: '海域',
+    btnRefreshMap: '重新整理地圖',
+    btnMapDc: '發地圖到 Discord',
+    mapEmpty: '連線伺服器後自動載入高畫質地圖、資源點與隊友即時位置。',
+    membersTitle: '隊伍成員與即時座標',
+    membersEmpty: '連線伺服器後，顯示隊員在線、存活狀態與地圖網格座標。',
+    chatTitle: '隊伍聊天',
+    btnSendTime: '播報當前時間',
+    chatEmpty: '連線伺服器後同步遊戲內隊伍聊天',
+    phChat: '輸入訊息直接發送到遊戲內隊伍頻道（支援最多 128 字）',
+    btnSendChat: '發送訊息',
+    eventsTitle: '活動記錄',
+    eventsDesc: '連線、死亡座標、上下線、Discord 聯動與播報結果即時記錄。首次連線只讀取狀態，不補發歷史記錄。',
+    eventsEmpty: '等待第一條活動記錄',
+    guideTitle: '遊戲內與 Discord 怎麼用',
+    guideHtml: '在<strong>遊戲隊伍聊天</strong>或<strong>Discord 頻道</strong>發送指令（Discord 同時支援斜線指令 <code>/time</code> <code>/pop</code> <code>/pos</code> <code>/deaths</code> <code>/map</code> <code>/say</code> <code>/leader</code>）：<br><code>!時間</code> / <code>!time</code> · 當前遊戲時間 + 天亮/天黑倒數計時<br><code>!人數</code> / <code>!pop</code> · 伺服器在線人數與排隊人數<br><code>!位置</code> / <code>!pos</code> · 全體隊友當前地圖網格座標<br><code>!死亡</code> / <code>!deaths</code> · 本次執行最近死亡記錄（含網格座標）<br><code>!隊長</code> / <code>!leader [名字]</code> · 將隊長移交給自己或指定隊友（需本人當前為隊長）<br><code>!地圖</code> / <code>!map</code>（僅 Discord）· 發送伺服器高畫質地圖與隊友座標到 Discord<br><code>!發送 內容</code> / <code>!say 內容</code>（僅 Discord）· 從 Discord 發訊息到遊戲隊伍頻道<br><code>!幫助</code> / <code>!help</code> · 查看指令列表',
+    guideFoot: '死亡依據 Rust+ 隊伍狀態輪詢檢測，可能存在約 10 秒延遲；離線或斷線期間的死亡可能漏報。',
+    footer: '本機部署 · 僅監聽 127.0.0.1:3210 · 使用 rustplus.js 開源通訊庫 · 多語言網頁控制台',
+    leaderBadge: '👑 隊長',
+    gridPrefix: '座標 ',
+    online: '在線', offline: '離線', alive: '存活', dead: '死亡',
+    makeLeader: '設為隊長',
+    waitPair: '等待配對',
+    waitServerMeta: '配對後顯示在線與排隊人數',
+    timeHint: '隊伍聊天輸入 !時間 或 !time',
+    syncHint: '約每 10 秒同步位置與狀態',
+    lastUpdated: '最後更新 ',
+    offlineService: '無法連線本機服務',
+    savedOk: '設定已儲存',
+    dcSavedOk: 'Discord 設定已儲存',
+    dcTestOk: '已發送測試卡片到 Discord',
+    dcMapOk: '已發送伺服器地圖到 Discord',
+    sentOk: '已發送到隊伍頻道',
+    submittedOk: '操作已提交',
+    switchedOk: '已切換並正在連線伺服器',
+    deletedOk: '已從收藏夾移除',
+    chatSentOk: '訊息已發送到隊伍頻道',
+    importedOk: '設定已匯入'
+  },
+  en: {
+    pageTitle: 'Rust+ Team Assistant',
+    eyebrow: 'RUST COMPANION · LOCAL CONSOLE',
+    title: 'Rust+ Team Assistant',
+    subtitle: 'Death grid alerts, day/night countdown, live map, team chat & Discord bot.',
+    statServer: 'Current Server',
+    statTime: 'In-Game Time',
+    statTeam: 'Team Online / Total',
+    sec01Title: '01 · Pair Server',
+    sec01Desc: 'Link your Steam account on first use. Auto-connects on startup or when a new pairing arrives.',
+    btnRegister: 'Open Steam Pairing Login',
+    step1: 'Click the button to log into Steam in a dedicated browser window (Chrome or Edge).',
+    step2: 'After logging in, join your target Rust server.',
+    step3: 'Press ESC → Rust+ → Pair with Server.',
+    step4: 'Once paired, the server is saved and connected automatically.',
+    btnListen: 'Re-listen for Pairing',
+    sec01Note: 'Powered by rustplus.js. A dedicated browser profile temporarily disables cross-origin isolation only for Steam pairing and closes automatically.',
+    importTitle: 'Import Existing Config',
+    importDesc: 'Paste rustplus.config.json or server pairing JSON. Tokens stay on your PC.',
+    importPh: 'Paste config JSON here',
+    btnImport: 'Import Config',
+    sec02Title: '02 · Connection & Alerts',
+    savedLabel: 'Saved Servers',
+    noSaved: 'No saved servers yet',
+    btnSwitch: 'Switch & Connect',
+    btnDelete: 'Remove Selected',
+    lblName: 'Server Label',
+    lblHost: 'Server IP / Host',
+    phHost: 'Auto-filled after pairing',
+    lblPort: 'Rust+ App Port (not game port)',
+    lblSteamId: 'SteamID64',
+    lblToken: 'Server Player Token',
+    phToken: 'Saved automatically; leave blank to keep current token',
+    chkDeath: 'Broadcast teammate deaths to in-game team chat (with grid)',
+    chkOnline: 'Broadcast teammate online / offline to in-game team chat',
+    lblTimeEvery: 'Periodic Time Broadcast (with day/night countdown)',
+    optOff: 'Off (query via command only)',
+    opt5: 'Every 5 mins', opt10: 'Every 10 mins', opt15: 'Every 15 mins', opt30: 'Every 30 mins', opt60: 'Every 60 mins',
+    btnSave: 'Save Settings',
+    btnConnect: 'Connect',
+    btnDisconnect: 'Disconnect',
+    sec02Foot: 'Reconnect after changing host/port/token. Keep this app running in the background.',
+    sec03Title: '03 · Discord Bot & Webhook',
+    sec03Desc: 'Use a Webhook URL for one-way alerts, or Bot Token + Channel ID for two-way slash commands & chat bridge.',
+    chkDcEnable: 'Enable Discord Integration',
+    lblDcWebhook: 'Option A · Discord Webhook URL (Optional, no bot needed)',
+    lblDcToken: 'Option B · Discord Bot Token (Slash & text commands)',
+    phDcTokenSaved: 'Bot Token saved; leave blank to keep',
+    phDcTokenEmpty: 'Paste Discord Bot Token (optional)',
+    lblDcChannel: 'Discord Channel ID (numeric, right-click channel → Copy ID)',
+    chkDcDeath: 'Send teammate death embeds to Discord',
+    chkDcOnline: 'Send teammate online / offline embeds to Discord',
+    chkDcChat: 'Forward in-game team chat to Discord',
+    chkDcBridge: 'Forward Discord channel messages into in-game team chat',
+    btnSaveDc: 'Save Discord Settings',
+    btnTestDc: 'Send Test Embed',
+    mapTitle: 'Live Server Map',
+    chkMonuments: 'Monuments',
+    chkMembers: 'Team & Deaths',
+    hoverPrefix: 'Grid: ',
+    ocean: 'Ocean',
+    btnRefreshMap: 'Refresh Map',
+    btnMapDc: 'Send Map to Discord',
+    mapEmpty: 'Connect to a server to load the high-res map, monuments, and live team positions.',
+    membersTitle: 'Team Members & Grid Positions',
+    membersEmpty: 'Connect to a server to see teammate status and map grid coordinates.',
+    chatTitle: 'Team Chat',
+    btnSendTime: 'Broadcast Time',
+    chatEmpty: 'Connect to a server to sync in-game team chat',
+    phChat: 'Type a message to send to in-game team chat (max 128 chars)',
+    btnSendChat: 'Send',
+    eventsTitle: 'Activity Log',
+    eventsDesc: 'Real-time log of connections, death coordinates, presence, and Discord alerts.',
+    eventsEmpty: 'Waiting for first activity event',
+    guideTitle: 'In-Game & Discord Commands',
+    guideHtml: 'Send commands in <strong>In-Game Team Chat</strong> or <strong>Discord</strong> (Discord also supports slash commands <code>/time</code> <code>/pop</code> <code>/pos</code> <code>/deaths</code> <code>/map</code> <code>/say</code> <code>/leader</code>):<br><code>!time</code> / <code>!时间</code> · Current in-game time & day/night countdown<br><code>!pop</code> / <code>!人数</code> · Server online & queue count<br><code>!pos</code> / <code>!位置</code> · All teammates\' current map grid coordinates<br><code>!deaths</code> / <code>!死亡</code> · Recent death records with grid coordinates<br><code>!leader [name]</code> / <code>!队长</code> · Promote yourself or a teammate to team leader<br><code>!map</code> / <code>!地图</code> (Discord) · Post high-res server map & team positions to Discord<br><code>!say text</code> / <code>!发送</code> (Discord) · Send a message from Discord to in-game team chat<br><code>!help</code> / <code>!帮助</code> · Show command list',
+    guideFoot: 'Deaths are detected via ~10s Rust+ polling; deaths while disconnected may be missed.',
+    footer: 'Local deployment · Listens only on 127.0.0.1:3210 · Powered by rustplus.js · Multi-language Web Console',
+    leaderBadge: '👑 Leader',
+    gridPrefix: 'Grid ',
+    online: 'Online', offline: 'Offline', alive: 'Alive', dead: 'Dead',
+    makeLeader: 'Promote',
+    waitPair: 'Waiting for pairing',
+    waitServerMeta: 'Online & queue count shown after connecting',
+    timeHint: 'Type !time in team chat',
+    syncHint: 'Synced every ~10s',
+    lastUpdated: 'Updated ',
+    offlineService: 'Cannot reach local service',
+    savedOk: 'Settings saved',
+    dcSavedOk: 'Discord settings saved',
+    dcTestOk: 'Test embed sent to Discord',
+    dcMapOk: 'Server map sent to Discord',
+    sentOk: 'Sent to team chat',
+    submittedOk: 'Action submitted',
+    switchedOk: 'Switched server & connecting',
+    deletedOk: 'Removed from saved servers',
+    chatSentOk: 'Message sent to team chat',
+    importedOk: 'Configuration imported'
+  }
+};
+
+const STATUS_MAP = {
+  '已连接': {'zh-TW': '已連線', en: 'Connected'},
+  '未连接': {'zh-TW': '未連線', en: 'Disconnected'},
+  '连接中': {'zh-TW': '連線中', en: 'Connecting'},
+  '验证配对中': {'zh-TW': '驗證配對中', en: 'Authenticating'},
+  '请求失败': {'zh-TW': '請求失敗', en: 'Request Failed'},
+  '连接中断，30 秒后重试': {'zh-TW': '連線中斷，30 秒後重試', en: 'Disconnected, retrying in 30s'},
+  '尚未配对': {'zh-TW': '尚未配對', en: 'Not paired yet'},
+  '等待游戏内 ESC → Rust+ → 与服务器配对': {'zh-TW': '等待遊戲內 ESC → Rust+ → 與伺服器配對', en: 'Waiting for in-game ESC → Rust+ → Pair with Server'},
+  '未启用': {'zh-TW': '未啟用', en: 'Disabled'},
+  'Webhook 已就绪（单向推送）': {'zh-TW': 'Webhook 已就緒（單向推送）', en: 'Webhook Ready (One-way)'}
+};
+
+let lang = localStorage.getItem('rustplus_lang') || 'zh-CN';
+if (!I18N[lang]) lang = 'zh-CN';
+const t = k => I18N[lang]?.[k] || I18N['zh-CN'][k] || k;
+function trStatus(str) {
+  if (!str || lang === 'zh-CN') return str;
+  if (STATUS_MAP[str]?.[lang]) return STATUS_MAP[str][lang];
+  if (str.startsWith('已收到服务器配对：')) {
+    const n = str.slice('已收到服务器配对：'.length);
+    return lang === 'en' ? `Paired with server: ${n}` : `已收到伺服器配對：${n}`;
+  }
+  if (str.startsWith('机器人在线：')) {
+    return lang === 'en' ? str.replace('机器人在线：', 'Bot Online: ').replace('（支持斜杠命令与 !命令）', ' (Slash & ! commands)').replace('（仅斜杠命令与 @提及（未开 Message Content 权限））', ' (Slash & @mention only)') : str.replace('机器人在线：', '機器人在線：').replace('（支持斜杠命令与 !命令）', '（支援斜線指令與 !指令）');
+  }
+  return str;
+}
+
+let token='',loaded=false,hasToken=false,latestState=null,mapImg=null,mapLoadedAt=0;
+const $=id=>document.getElementById(id);
+const fields=['name','host','port','playerId','timeEvery','deathNotify','onlineNotify'];
+let noticeTimer;
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.title = t('pageTitle');
+  $('langSelect').value = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  $('guideContent').innerHTML = t('guideHtml');
+  $('hoverGrid').textContent = t('hoverPrefix') + '--';
+  if (latestState) {
+    renderServers(latestState.config);
+    renderState(latestState);
+  }
+}
+
+function notice(text){$('notice').textContent=text;$('notice').style.display='block';clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>$('notice').style.display='none',5500);}
+async function api(route,body={}){const r=await fetch('/api/'+route,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':token},body:JSON.stringify(body)});const j=await r.json();if(!r.ok)throw Error(j.error||'操作失败');return j;}
+function settings(){const b={};fields.forEach(k=>b[k]=$(k).type==='checkbox'?$(k).checked:$(k).value);b.playerToken=$('playerToken').value;return b;}
+function discordSettings(){
+  return {
+    enabled:$('dcEnabled').checked,
+    webhookUrl:$('dcWebhook').value,
+    botToken:$('dcBotToken').value,
+    channelId:$('dcChannelId').value,
+    notifyDeath:$('dcNotifyDeath').checked,
+    notifyOnline:$('dcNotifyOnline').checked,
+    notifyChat:$('dcNotifyChat').checked,
+    chatBridge:$('dcChatBridge').checked
+  };
+}
+function fill(c){
+  fields.forEach(k=>{if($(k).type==='checkbox')$(k).checked=Boolean(c[k]);else if(c[k]!==undefined)$(k).value=c[k];});
+  hasToken=c.hasToken;$('playerToken').value='';
+  const dc=c.discord||{};
+  $('dcEnabled').checked=Boolean(dc.enabled);
+  $('dcWebhook').value=dc.webhookUrl||'';
+  $('dcBotToken').value='';
+  $('dcBotToken').placeholder=dc.hasBotToken?t('phDcTokenSaved'):t('phDcTokenEmpty');
+  $('dcChannelId').value=dc.channelId||'';
+  $('dcNotifyDeath').checked=dc.notifyDeath!==false;
+  $('dcNotifyOnline').checked=Boolean(dc.notifyOnline);
+  $('dcNotifyChat').checked=Boolean(dc.notifyChat);
+  $('dcChatBridge').checked=Boolean(dc.chatBridge);
+}
+function renderServers(c){
+  if(!c)return;
+  const sel=$('savedServers');const prev=sel.value||c.activeServerId;sel.replaceChildren();
+  const list=c.servers||[];
+  if(!list.length){const o=document.createElement('option');o.value='';o.textContent=t('noSaved');sel.append(o);return;}
+  for(const s of list){const o=document.createElement('option');o.value=s.id;o.textContent=`${s.name} (${s.host}:${s.port})`;sel.append(o);}
+  if(list.some(s=>s.id===prev))sel.value=prev;
+}
+function worldToCanvas(x,y,meta,w,h){
+  const ms=meta.mapSize||4500,mw=meta.width||w,mh=meta.height||h,om=meta.oceanMargin||0;
+  const playW=Math.max(1,mw-2*om),playH=Math.max(1,mh-2*om);
+  const px=(om+(x/ms)*playW)/mw*w;
+  const py=(om+((ms-y)/ms)*playH)/mh*h;
+  return [px,py];
+}
+function canvasToGrid(px,py,meta,w,h){
+  if(!meta||!meta.mapSize)return '--';
+  const ms=meta.mapSize,mw=meta.width||w,mh=meta.height||h,om=meta.oceanMargin||0;
+  const playW=Math.max(1,mw-2*om),playH=Math.max(1,mh-2*om);
+  const x=((px/w*mw)-om)/playW*ms;
+  const y=ms-(((py/h*mh)-om)/playH*ms);
+  if(x<0||x>ms||y<0||y>ms)return t('ocean');
+  const cell=146.28571428571428,maxIdx=Math.max(0,Math.floor(ms/cell)-1);
+  const col=Math.min(maxIdx,Math.max(0,Math.floor(x/cell)));
+  const row=Math.min(maxIdx,Math.max(0,Math.floor((ms-y)/cell)));
+  const letters=col<26?String.fromCharCode(65+col):String.fromCharCode(64+Math.floor(col/26))+String.fromCharCode(65+(col%26));
+  return letters+row;
+}
+let mapZoom=1,mapPanX=0,mapPanY=0,isDragging=false,dragStartX=0,dragStartY=0;
+function clampPan(w,h){
+  const minX=w*(1-mapZoom),minY=h*(1-mapZoom);
+  mapPanX=Math.min(0,Math.max(minX,mapPanX));
+  mapPanY=Math.min(0,Math.max(minY,mapPanY));
+}
+function resetMapZoom(){
+  mapZoom=1;mapPanX=0;mapPanY=0;
+  $('resetZoom').textContent='100%';
+  drawMap();
+}
+function drawMap(){
+  const canvas=$('mapCanvas'),empty=$('mapEmpty'),s=latestState,meta=s?.mapMeta;
+  if(!meta?.hasImage||!mapImg){canvas.style.display='none';empty.style.display='block';return;}
+  empty.style.display='none';canvas.style.display='block';
+  const w=canvas.width=1200,h=canvas.height=1200,ctx=canvas.getContext('2d');
+  clampPan(w,h);
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.fillStyle=meta.background||'#0b3b4a';ctx.fillRect(0,0,w,h);
+  ctx.setTransform(mapZoom,0,0,mapZoom,mapPanX,mapPanY);
+  ctx.drawImage(mapImg,0,0,w,h);
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.textAlign='center';ctx.textBaseline='bottom';ctx.lineJoin='round';
+  if($('showMonuments').checked){
+    ctx.font='700 25px "Microsoft YaHei",sans-serif';
+    ctx.lineWidth=5;ctx.strokeStyle='rgba(0,0,0,0.88)';
+    for(const m of meta.monuments||[]){
+      const [bx,by]=worldToCanvas(m.x,m.y,meta,w,h);
+      const px=bx*mapZoom+mapPanX,py=by*mapZoom+mapPanY;
+      if(px<-140||px>w+140||py<-60||py>h+60)continue;
+      const label=m.labels?.[lang]||m.name;
+      ctx.strokeText(label,px,py);
+      ctx.fillStyle='#f4f8f2';ctx.fillText(label,px,py);
+    }
+  }
+  if($('showMembers').checked){
+    for(const d of (s.deaths||[]).slice(0,5)){
+      const [bx,by]=worldToCanvas(d.x,d.y,meta,w,h);
+      const px=bx*mapZoom+mapPanX,py=by*mapZoom+mapPanY;
+      ctx.font='700 30px "Microsoft YaHei",sans-serif';
+      ctx.lineWidth=5;ctx.strokeStyle='rgba(0,0,0,0.9)';ctx.strokeText('✕',px,py+11);
+      ctx.fillStyle='#ff6b6b';ctx.fillText('✕',px,py+11);
+    }
+    ctx.font='700 28px "Microsoft YaHei",sans-serif';
+    for(const m of s.members||[]){
+      const [bx,by]=worldToCanvas(m.x,m.y,meta,w,h);
+      const px=bx*mapZoom+mapPanX,py=by*mapZoom+mapPanY;
+      ctx.beginPath();ctx.arc(px,py,11,0,Math.PI*2);
+      ctx.fillStyle=!m.isAlive?'#ff6b6b':(m.isOnline?'#b1e784':'#8fa395');
+      ctx.fill();ctx.lineWidth=3.5;ctx.strokeStyle='#101513';ctx.stroke();
+      const label=`${m.isLeader?'👑':''}${m.name}${m.grid?' ['+m.grid+']':''}`;
+      ctx.lineWidth=6;ctx.strokeStyle='rgba(0,0,0,0.92)';ctx.strokeText(label,px,py-14);
+      ctx.fillStyle=m.isAlive?'#b1e784':'#ffb3a0';ctx.fillText(label,px,py-14);
+    }
+  }
+}
+$('mapCanvas').addEventListener('wheel',e=>{
+  if(!mapImg)return;
+  e.preventDefault();
+  const canvas=$('mapCanvas'),rect=canvas.getBoundingClientRect();
+  const cx=(e.clientX-rect.left)/rect.width*canvas.width;
+  const cy=(e.clientY-rect.top)/rect.height*canvas.height;
+  const prevZoom=mapZoom;
+  const factor=e.deltaY<0?1.22:(1/1.22);
+  mapZoom=Math.min(8,Math.max(1,mapZoom*factor));
+  mapPanX=cx-(cx-mapPanX)*(mapZoom/prevZoom);
+  mapPanY=cy-(cy-mapPanY)*(mapZoom/prevZoom);
+  clampPan(canvas.width,canvas.height);
+  $('resetZoom').textContent=Math.round(mapZoom*100)+'%';
+  const bx=(cx-mapPanX)/mapZoom,by=(cy-mapPanY)/mapZoom;
+  $('hoverGrid').textContent=t('hoverPrefix')+canvasToGrid(bx,by,latestState?.mapMeta,canvas.width,canvas.height);
+  drawMap();
+},{passive:false});
+$('mapCanvas').addEventListener('mousedown',e=>{
+  if(e.button!==0||mapZoom<=1)return;
+  isDragging=true;
+  const canvas=$('mapCanvas'),rect=canvas.getBoundingClientRect();
+  dragStartX=(e.clientX-rect.left)/rect.width*canvas.width-mapPanX;
+  dragStartY=(e.clientY-rect.top)/rect.height*canvas.height-mapPanY;
+  canvas.style.cursor='grabbing';
+});
+window.addEventListener('mouseup',()=>{
+  if(isDragging){isDragging=false;$('mapCanvas').style.cursor='crosshair';}
+});
+$('mapCanvas').addEventListener('dblclick',resetMapZoom);
+$('resetZoom').onclick=resetMapZoom;
+$('mapCanvas').addEventListener('mousemove',e=>{
+  const canvas=e.target,rect=canvas.getBoundingClientRect();
+  const cx=(e.clientX-rect.left)/rect.width*canvas.width;
+  const cy=(e.clientY-rect.top)/rect.height*canvas.height;
+  if(isDragging){
+    mapPanX=cx-dragStartX;
+    mapPanY=cy-dragStartY;
+    clampPan(canvas.width,canvas.height);
+    drawMap();
+  }
+  const bx=(cx-mapPanX)/mapZoom,by=(cy-mapPanY)/mapZoom;
+  $('hoverGrid').textContent=t('hoverPrefix')+canvasToGrid(bx,by,latestState?.mapMeta,canvas.width,canvas.height);
+});
+for(const id of ['showMonuments','showMembers'])$(id).onchange=drawMap;
+
+function renderState(s){
+  $('connection').textContent=trStatus(s.connection);
+  $('pairing').textContent=trStatus(s.pairing);
+  $('discordStatus').textContent=trStatus(s.discordStatus||'未启用');
+  $('server').textContent=s.server?.name||s.config.name||t('waitPair');
+  if(s.server){
+    $('serverMeta').textContent=lang==='en'
+      ?`Online ${s.server.players} / ${s.server.maxPlayers} · Queue ${s.server.queuedPlayers||0} · Map ${s.server.mapSize}`
+      :(lang==='zh-TW'?`在線 ${s.server.players} / ${s.server.maxPlayers} · 排隊 ${s.server.queuedPlayers||0} · 地圖 ${s.server.mapSize}`:`在线 ${s.server.players} / ${s.server.maxPlayers} · 排队 ${s.server.queuedPlayers||0} · 地图 ${s.server.mapSize}`);
+  }else{
+    $('serverMeta').textContent=t('waitServerMeta');
+  }
+  $('clock').textContent=s.clock==='未知'?'--:--':s.clock;
+  $('dayNight').textContent=s.dayNight?.text||t('timeHint');
+  $('count').textContent=s.authenticated?s.members.filter(m=>m.isOnline).length+' / '+s.members.length:'— / —';
+  $('updated').textContent=s.updated?t('lastUpdated')+new Date(s.updated).toLocaleTimeString(lang):t('syncHint');
+
+  if(s.mapMeta?.hasImage&&s.mapMeta.updatedAt!==mapLoadedAt){
+    mapLoadedAt=s.mapMeta.updatedAt;
+    const img=new Image();
+    img.onload=()=>{mapImg=img;drawMap();};
+    img.src='/api/map.jpg?t='+mapLoadedAt;
+  }else drawMap();
+
+  const members=$('members');members.replaceChildren();members.className=s.members.length?'':'empty';
+  if(!s.members.length)members.textContent=t('membersEmpty');
+  for(const m of s.members){
+    const row=document.createElement('div');row.className='member';
+    const left=document.createElement('div');left.className='member-info';
+    const n=document.createElement('strong');n.textContent=m.name;left.append(n);
+    if(m.isLeader){const l=document.createElement('span');l.className='tag';l.textContent=t('leaderBadge');left.append(l);}
+    if(m.grid){const g=document.createElement('span');g.className='tag';g.textContent=t('gridPrefix')+m.grid;left.append(g);}
+    const st=document.createElement('span');st.className='tag '+(m.isAlive?(m.isOnline?'':'warn'):'dead');
+    st.textContent=(m.isOnline?t('online'):t('offline'))+' · '+(m.isAlive?t('alive'):t('dead'));left.append(st);
+    const right=document.createElement('div');
+    if(!m.isLeader&&s.authenticated){
+      const btn=document.createElement('button');btn.type='button';btn.className='secondary small';btn.textContent=t('makeLeader');
+      btn.onclick=()=>action(btn,async()=>{await api('leader',{steamId:m.steamId});notice(t('submittedOk'));});
+      right.append(btn);
+    }
+    row.append(left,right);members.append(row);
+  }
+
+  const chatList=$('chatList');chatList.replaceChildren();
+  if(!(s.chat||[]).length){const e=document.createElement('div');e.className='empty';e.textContent=t('chatEmpty');chatList.append(e);}
+  for(const c of (s.chat||[]).slice().reverse()){
+    const row=document.createElement('div');row.className='chat-row';
+    const tm=document.createElement('time');tm.textContent=new Date(c.time*1000).toLocaleTimeString(lang);
+    const nm=document.createElement('span');nm.className='chat-name';nm.style.color=c.color||'#b1e784';nm.textContent=c.name+':';
+    const msg=document.createElement('span');msg.textContent=c.message;
+    row.append(tm,nm,msg);chatList.append(row);
+  }
+
+  const events=$('events');events.replaceChildren();
+  if(!s.events.length){const e=document.createElement('div');e.className='empty';e.textContent=t('eventsEmpty');events.append(e);}
+  for(const e of s.events){
+    const row=document.createElement('div');row.className='event '+e.type;
+    const time=document.createElement('time');time.textContent=new Date(e.at).toLocaleString(lang);
+    const tx=document.createElement('span');tx.textContent=e.text;
+    row.append(time,tx);events.append(row);
+  }
+}
+
+async function refresh(){
+  try{
+    const s=await(await fetch('/api/state')).json();
+    latestState=s;token=s.csrf;
+    if(!loaded){
+      if(s.config?.lang&&I18N[s.config.lang]&&!localStorage.getItem('rustplus_lang')){lang=s.config.lang;}
+      applyLang();fill(s.config);renderServers(s.config);loaded=true;
+    }
+    if(!hasToken&&s.config.hasToken){fill(s.config);renderServers(s.config);}
+    renderState(s);
+  }catch{$('connection').textContent=t('offlineService');}
+}
+
+$('langSelect').onchange=async e=>{
+  lang=e.target.value;
+  localStorage.setItem('rustplus_lang',lang);
+  applyLang();
+  try{await api('lang',{lang});await refresh();}catch{}
+};
+
+async function action(button,work){button.disabled=true;try{await work();await refresh();}catch(e){notice(e.message);}finally{button.disabled=false;}}
+$('settings').onsubmit=e=>{e.preventDefault();action(e.submitter,async()=>{await api('config',settings());loaded=false;$('playerToken').value='';notice(t('savedOk'));});};
+$('discordForm').onsubmit=e=>{e.preventDefault();action(e.submitter,async()=>{await api('discord',discordSettings());loaded=false;$('dcBotToken').value='';notice(t('dcSavedOk'));});};
+$('dcTest').onclick=()=>action($('dcTest'),async()=>{await api('discord',discordSettings());loaded=false;await api('discord-test');notice(t('dcTestOk'));});
+$('sendMapDiscord').onclick=()=>action($('sendMapDiscord'),async()=>{await api('discord-map');notice(t('dcMapOk'));});
+for(const [id,route]of [['connect','connect'],['disconnect','disconnect'],['listen','listen'],['register','register'],['sendTime','send-time'],['refreshMap','refresh-map']])$(id).onclick=()=>action($(id),async()=>{if(id==='connect')await api('config',settings());await api(route);loaded=false;notice(id==='sendTime'?t('sentOk'):t('submittedOk'));});
+$('switchServer').onclick=()=>action($('switchServer'),async()=>{const id=$('savedServers').value;if(!id)throw Error('请先选择已保存的服务器');await api('server-select',{id});loaded=false;notice(t('switchedOk'));});
+$('deleteServer').onclick=()=>action($('deleteServer'),async()=>{const id=$('savedServers').value;if(!id)throw Error('请先选择要移除的服务器');await api('server-delete',{id});loaded=false;notice(t('deletedOk'));});
+$('chatForm').onsubmit=e=>{e.preventDefault();const btn=e.submitter||$('chatForm').querySelector('button');action(btn,async()=>{const message=$('chatInput').value;await api('chat',{message});$('chatInput').value='';notice(t('chatSentOk'));});};
+$('import').onclick=()=>action($('import'),async()=>{await api('import',{config:$('importJson').value});$('importJson').value='';loaded=false;notice(t('importedOk'));});
+applyLang();refresh();setInterval(refresh,3000);
+</script></body></html>

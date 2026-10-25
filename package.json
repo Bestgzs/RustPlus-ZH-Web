@@ -1,0 +1,18 @@
+{
+  "name": "rustplus-zh-web",
+  "version": "1.0.0",
+  "description": "Rust+ 中文队伍助手：本机网页控制台、队伍提醒、实时地图与 Discord 联动",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bestgzs/RustPlus-ZH-Web.git"
+  },
+  "engines": {"node": ">=24"},
+  "scripts": {
+    "start": "node server.cjs",
+    "launch": "node launcher.cjs",
+    "stop": "node launcher.cjs --stop"
+  },
+  "dependencies": {"@liamcottle/rustplus.js": "2.5.0"}
+}
