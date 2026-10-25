@@ -1,6 +1,15 @@
 # Rust+ 中文队伍助手
 
+本项目基于 [alexemanuelol/rustplusplus](https://github.com/alexemanuelol/rustplusplus) 修改与适配，原作者为 Alexander Emanuelsson（alexemanuelol）及上游贡献者。本仓库由 Bestgzs 维护，采用 **GPL-3.0-or-later** 许可证；这是社区修改版。
+
 通过本机网页管理 Rust+ 队伍信息，查看地图与队友位置，并接收中文提醒。支持简体中文、繁体中文和英文界面，以及 Discord Webhook / Bot 联动。
+
+## 来源与本版适配
+
+- 上游项目：[rustplusplus](https://github.com/alexemanuelol/rustplusplus)。
+- 本版主要适配方向：本机网页控制台、多语言界面、Windows 启停入口，以及网页中的队伍信息、地图和 Discord 配置管理。
+- 修改维护者：Bestgzs；本次公开版本整理日期：2026-10-25。最初修改所基于的上游提交尚未记录。
+- 上游版权和许可声明见 [NOTICE](NOTICE)；完整许可证见 [LICENSE](LICENSE)。
 
 ## 功能
 
@@ -72,4 +81,6 @@ Discord Bot 支持 `/time`、`/pop`、`/pos`、`/deaths`、`/map`、`/say`、`/l
 
 ## 许可与致谢
 
-本项目源码采用 [MIT License](LICENSE)。基于 [@liamcottle/rustplus.js](https://github.com/liamcottle/rustplus.js) 2.5.0（MIT）开发；第三方组件保留各自许可证。项目是非官方社区工具，与 Facepunch、Valve 或 Discord 无隶属关系。
+本项目作为 rustplusplus 的修改版，按 [GNU GPL v3 或后续版本](LICENSE) 发布。原项目及贡献者的版权归各自权利人所有，Bestgzs 的修改不改变原作者的权利。再分发时应保留版权、许可证和修改声明；分发便携版时也应同时提供对应源码及许可证。
+
+感谢 [alexemanuelol/rustplusplus](https://github.com/alexemanuelol/rustplusplus) 和 [@liamcottle/rustplus.js](https://github.com/liamcottle/rustplus.js)。本版使用 rustplus.js 2.5.0（MIT），第三方依赖保留各自许可证。项目是非官方社区工具，与 Facepunch、Valve 或 Discord 无隶属关系。

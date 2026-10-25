@@ -1,0 +1,42 @@
+RustPlus-ZH-Web — upstream attribution and modification notice
+
+Upstream project: rustplusplus
+https://github.com/alexemanuelol/rustplusplus
+
+Original copyright and license notice from the upstream entry point:
+
+Copyright (C) 2022 Alexander Emanuelsson (alexemanuelol)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+Additional upstream contributions remain the property of their respective
+copyright holders. This notice does not replace notices in upstream files.
+
+Modification notice:
+Copyright (C) 2026 Bestgzs (modifications)
+Public source preparation date: 2026-10-25
+This community modification adapts the project for a local web console,
+multilingual use, Windows launch/stop scripts, and web-based team, map and
+Discord settings management. The original upstream starting commit has
+not been recorded. This is a modified community version.
+Source: https://github.com/Bestgzs/RustPlus-ZH-Web
+
+This modified work is distributed under GPL-3.0-or-later. The initial MIT
+label in this repository was added in error before upstream provenance
+was identified. It does not grant MIT rights to upstream GPL-covered code.
+See LICENSE for the complete GNU General Public License version 3 text.
+
+Third-party dependency:
+@liamcottle/rustplus.js 2.5.0, by Liam Cottle, MIT License
+https://github.com/liamcottle/rustplus.js
+Other dependencies retain their own copyright and license notices.

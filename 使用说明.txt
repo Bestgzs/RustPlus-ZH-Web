@@ -44,6 +44,11 @@ data 包含账号配对凭据、配置、浏览器资料和日志，不要转发
 给别人使用时，请直接转发收到的原始压缩包，不要重新打包使用后的目录。
 
 项目
-中文网页与后台独立实现，基于 @liamcottle/rustplus.js 2.5.0（MIT）。
+本项目基于 alexemanuelol/rustplusplus 修改与适配，原作者为 Alexander Emanuelsson（alexemanuelol）及上游贡献者。
+https://github.com/alexemanuelol/rustplusplus
+本修改版由 Bestgzs 维护，按 GNU GPL v3 或后续版本发布。修改说明及原作者声明见 README.md、NOTICE；完整许可证见 LICENSE。
+本版使用 @liamcottle/rustplus.js 2.5.0（MIT）。
 https://github.com/liamcottle/rustplus.js
 Node.js 与各第三方依赖许可在 runtime/LICENSE.txt 和 node_modules 中保留。
+分发便携包时请附带 LICENSE、NOTICE，并提供与该版本对应的完整源码。
+本版源码：https://github.com/Bestgzs/RustPlus-ZH-Web
