@@ -1,4 +1,4 @@
-Rust+ 中文队伍助手 1.2.0 — Windows 便携版
+Rust+ 中文队伍助手 1.0.0 — Windows 便携版
 
 系统：Windows 10/11 64 位；Steam 配对登录需要 Google Chrome 或 Microsoft Edge（优先 Chrome，未安装时自动用 Windows 自带的 Edge）。
 内含 Node.js 24.19.0 与依赖，无需额外安装 Node.js、Python 或 PowerShell 7。

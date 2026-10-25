@@ -21,6 +21,17 @@
 - Discord Webhook 单向推送，或 Bot 双向聊天、地图图片和斜杠命令。
 - Steam 登录配对，或导入已有 Rust+ 配置。
 
+## 下载即用（Windows）
+
+前往 [Releases 下载页面](https://github.com/Bestgzs/RustPlus-ZH-Web/releases/latest)，下载附件中的 `RustPlus-ZH-Web-1.0.0-Windows-x64.zip`。该便携包已包含 Node.js 与依赖，无需额外安装运行环境。
+
+1. 将 ZIP 完整解压到可写文件夹，不要在压缩包内直接运行。
+2. 双击 `Start.cmd`，网页控制台会自动打开。
+3. 首次使用时自行完成 Steam 登录与 Rust+ 服务器配对。
+4. 使用完毕双击 `Stop.cmd` 停止后台。
+
+适用于 Windows 10 / 11 64 位；Steam 登录配对需要 Chrome 或 Edge。发行版附带 SHA-256 校验文件。GitHub 自动生成的 `Source code` 压缩包供源码安装使用。
+
 ## 从源码运行
 
 主要使用环境为 Windows 10 / 11。安装 Node.js 24 或更新版本；Steam 登录配对需要 Chrome 或 Edge。
